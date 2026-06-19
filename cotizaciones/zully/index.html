@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Cotización Pal' Hambré - San Pedro Huilense</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Montserrat:wght@400;500;600;700&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family:'Montserrat', sans-serif;
+    background:#0f1410;
+    color:#e9e6dd;
+    scroll-behavior:smooth;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #11160f 0%, #161c13 100%);
+    padding: 0 0 40px 0;
+  }
+
+  /* ENTRANCE ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(18px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity:0; }
+    to { opacity:1; }
+  }
+  .reveal {
+    opacity:0;
+    animation: fadeUp 0.7s ease forwards;
+  }
+  .reveal-1 { animation-delay: 0.05s; }
+  .reveal-2 { animation-delay: 0.18s; }
+  .reveal-3 { animation-delay: 0.30s; }
+  .reveal-4 { animation-delay: 0.42s; }
+  .reveal-5 { animation-delay: 0.54s; }
+  .reveal-6 { animation-delay: 0.66s; }
+  .reveal-7 { animation-delay: 0.78s; }
+  .reveal-8 { animation-delay: 0.90s; }
+
+  /* CONFETTI */
+  @keyframes floatConfetti {
+    0%   { transform: translateY(0) rotate(0deg); opacity:0; }
+    10%  { opacity:1; }
+    100% { transform: translateY(-160px) translateX(var(--drift, 12px)) rotate(220deg); opacity:0; }
+  }
+  .confetti-layer {
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .confetti {
+    position:absolute;
+    bottom: -10px;
+    width: 7px;
+    height: 7px;
+    border-radius: 1px;
+    animation: floatConfetti linear infinite;
+    opacity:0.85;
+  }
+
+  /* SHIMMER on prices */
+  @keyframes shimmer {
+    0%   { background-position: -120px 0; }
+    100% { background-position: 220px 0; }
+  }
+  .pp {
+    background-image: linear-gradient(90deg, #d8c089 0%, #f3e2b0 35%, #d8c089 60%);
+    background-size: 220px 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3.2s ease-in-out infinite;
+  }
+
+  /* HEADER */
+  .header {
+    position:relative;
+    padding: 48px 56px 36px 56px;
+    background: radial-gradient(120% 120% at 0% 0%, #1f3320 0%, #11160f 70%);
+    border-bottom: 1px solid #3a4a33;
+    overflow:hidden;
+  }
+  .header-top {
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+  .brand-name {
+    font-family:'Playfair Display', serif;
+    font-size: 34px;
+    font-weight:800;
+    color:#d8c089;
+    letter-spacing: 0.5px;
+  }
+  .brand-tagline {
+    font-size: 11.5px;
+    color:#9fb190;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .doc-tag {
+    text-align:right;
+  }
+  .doc-tag .label {
+    font-size: 11px;
+    letter-spacing: 2px;
+    color:#c97b4a;
+    text-transform:uppercase;
+    font-weight:700;
+  }
+  .doc-tag .num {
+    font-size: 13px;
+    color:#9fb190;
+    margin-top: 2px;
+  }
+
+  .event-banner {
+    margin-top: 30px;
+    display:flex;
+    align-items:center;
+    gap: 14px;
+  }
+  .event-banner .deco {
+    color:#c97b4a;
+    font-size:18px;
+  }
+  .event-title {
+    font-family:'Playfair Display', serif;
+    font-size: 26px;
+    font-weight:700;
+    color:#f3efe3;
+  }
+  .event-sub {
+    font-size: 13px;
+    color:#b7c2ab;
+    margin-top: 6px;
+    line-height:1.6;
+  }
+
+  /* CLIENT INFO STRIP */
+  .info-strip {
+    display:flex;
+    margin: 0 56px;
+    margin-top: -1px;
+    border: 1px solid #3a4a33;
+    border-top:none;
+  }
+  .info-cell {
+    flex:1;
+    padding: 18px 20px;
+    border-right: 1px solid #2a3624;
+  }
+  .info-cell:last-child { border-right:none; }
+  .info-cell .k {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #c97b4a;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .info-cell .v {
+    font-size: 14.5px;
+    color:#f3efe3;
+    font-weight:600;
+  }
+
+  /* ACTIVITY NOTE */
+  .activity {
+    margin: 32px 56px 0 56px;
+    background: #182216;
+    border-left: 3px solid #c97b4a;
+    padding: 18px 22px;
+    border-radius: 2px;
+  }
+  .activity .t {
+    font-size: 12px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:#d8c089;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .activity p {
+    font-size: 13.5px;
+    color:#c7d0bd;
+    line-height: 1.7;
+  }
+
+  /* MENU SECTION */
+  .menu-section {
+    margin: 38px 56px 0 56px;
+  }
+  .menu-section .heading {
+    font-family:'Playfair Display', serif;
+    font-size: 20px;
+    color:#f3efe3;
+    font-weight:700;
+    margin-bottom: 6px;
+  }
+  .menu-section .heading-sub {
+    font-size: 12.5px;
+    color:#9fb190;
+    margin-bottom: 24px;
+  }
+
+  .option-card {
+    border: 1px solid #34422c;
+    border-radius: 6px;
+    margin-bottom: 18px;
+    overflow:hidden;
+    background: #141a10;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+  .option-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.35), 0 0 0 1px #c97b4a;
+    border-color:#c97b4a;
+  }
+  .badge {
+    transition: transform 0.3s ease;
+  }
+  .option-card:hover .badge {
+    transform: scale(1.12) rotate(-6deg);
+  }
+  .option-head {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding: 16px 22px;
+    background: linear-gradient(90deg, #233019 0%, #1a2415 100%);
+    border-bottom: 1px solid #34422c;
+  }
+  .option-num {
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  .option-num .badge {
+    width:30px;height:30px;
+    border-radius:50%;
+    background:#c97b4a;
+    color:#15190f;
+    font-weight:800;
+    font-size:14px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .option-num .name {
+    font-size: 16.5px;
+    font-weight:700;
+    color:#f3efe3;
+  }
+  .option-price {
+    text-align:right;
+  }
+  .option-price .pp {
+    font-size: 18px;
+    font-weight:800;
+    color:#d8c089;
+  }
+  .option-price .pp-label {
+    font-size: 10px;
+    color:#8fa083;
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+  .option-body {
+    padding: 16px 22px 20px 22px;
+  }
+  .option-body .desc {
+    font-size: 13.5px;
+    color:#c7d0bd;
+    line-height: 1.7;
+  }
+  .option-total {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed #34422c;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .option-total .lbl {
+    font-size: 11.5px;
+    color:#8fa083;
+    letter-spacing:0.5px;
+  }
+  .option-total .amt {
+    font-size: 17px;
+    font-weight:800;
+    color:#9fc98a;
+  }
+
+  /* NOTES GRID */
+  .notes-grid {
+    margin: 38px 56px 0 56px;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .note-card {
+    border:1px solid #34422c;
+    border-radius:6px;
+    padding: 18px 20px;
+    background:#141a10;
+  }
+  .note-card .label {
+    font-size:11px;
+    letter-spacing:1.3px;
+    text-transform:uppercase;
+    color:#c97b4a;
+    font-weight:700;
+    margin-bottom:8px;
+  }
+  .note-card .text {
+    font-size: 12.8px;
+    color:#c7d0bd;
+    line-height:1.75;
+  }
+
+  /* FOOTER */
+  .footer {
+    margin: 40px 56px 0 56px;
+    padding-top: 24px;
+    border-top: 1px solid #3a4a33;
+    text-align:center;
+  }
+  .footer .brand {
+    font-family:'Playfair Display', serif;
+    font-size:18px;
+    color:#d8c089;
+    font-weight:800;
+  }
+  .footer .info {
+    font-size: 12px;
+    color:#9fb190;
+    margin-top:6px;
+    line-height:1.7;
+  }
+  .footer .ornament {
+    margin-top:10px;
+    color:#c97b4a;
+    letter-spacing: 6px;
+    font-size:12px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="confetti-layer">
+      <span class="confetti" style="left:8%;  background:#c97b4a; animation-duration:6.5s; animation-delay:0.2s;  --drift:14px;"></span>
+      <span class="confetti" style="left:18%; background:#d8c089; animation-duration:7.2s; animation-delay:1.4s;  --drift:-10px;"></span>
+      <span class="confetti" style="left:30%; background:#9fc98a; animation-duration:5.8s; animation-delay:0.6s;  --drift:8px;"></span>
+      <span class="confetti" style="left:46%; background:#c97b4a; animation-duration:6.9s; animation-delay:2.1s;  --drift:-16px;"></span>
+      <span class="confetti" style="left:60%; background:#d8c089; animation-duration:6.1s; animation-delay:0.9s;  --drift:10px;"></span>
+      <span class="confetti" style="left:74%; background:#9fc98a; animation-duration:7.6s; animation-delay:1.7s;  --drift:-12px;"></span>
+      <span class="confetti" style="left:86%; background:#c97b4a; animation-duration:6.4s; animation-delay:0.3s;  --drift:6px;"></span>
+      <span class="confetti" style="left:94%; background:#d8c089; animation-duration:7.0s; animation-delay:2.5s;  --drift:-8px;"></span>
+    </div>
+    <div class="header-top reveal reveal-1">
+      <div>
+        <div class="brand-name">Pal' Hambré</div>
+        <div class="brand-tagline">Cocina Gourmet · Catering &amp; Eventos</div>
+      </div>
+      <div class="doc-tag">
+        <div class="label">Cotización</div>
+        <div class="num">Neiva, Huila · Junio 2026</div>
+      </div>
+    </div>
+
+    <div class="event-banner reveal reveal-2">
+      <span class="deco">✦</span>
+      <div>
+        <div class="event-title">Celebración San Pedro Huilense</div>
+        <div class="event-sub">Una jornada de paseo en chiva por la ciudad, cerrada con la mejor sazón huilense para compartir en grupo.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-strip reveal reveal-3">
+    <div class="info-cell">
+      <div class="k">Cliente</div>
+      <div class="v">Zully Vanessa Ortiz</div>
+    </div>
+    <div class="info-cell">
+      <div class="k">Fecha del evento</div>
+      <div class="v">03 de julio de 2026</div>
+    </div>
+    <div class="info-cell">
+      <div class="k">Número de personas</div>
+      <div class="v">25 personas</div>
+    </div>
+  </div>
+
+  <div class="activity reveal reveal-4">
+    <div class="t">Programación del día</div>
+    <p>La actividad inicia con un paseo en chiva por la ciudad de Neiva, recorriendo los puntos más emblemáticos en ambiente de fiesta sampedrina. Al finalizar el recorrido, el grupo se reúne para disfrutar de la comida — Pal' Hambré pone la mesa con sabor huilense para cerrar la jornada con todo el gusto.</p>
+  </div>
+
+  <div class="menu-section reveal reveal-5">
+    <div class="heading">Opciones de menú</div>
+    <div class="heading-sub">Selecciona la opción que mejor se ajuste al grupo · Precio por persona</div>
+
+    <div class="option-card reveal reveal-6">
+      <div class="option-head">
+        <div class="option-num">
+          <div class="badge">1</div>
+          <div class="name">Asado Huilense</div>
+        </div>
+        <div class="option-price">
+          <div class="pp">$20.000</div>
+          <div class="pp-label">por persona</div>
+        </div>
+      </div>
+      <div class="option-body">
+        <div class="desc">Asado huilense 250 g, acompañado de arepa oreja'e perro e insulso asado. Incluye bebida 250 ml.</div>
+        <div class="option-total">
+          <div class="lbl">Total para 25 personas</div>
+          <div class="amt">$500.000</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="option-card reveal reveal-7">
+      <div class="option-head">
+        <div class="option-num">
+          <div class="badge">2</div>
+          <div class="name">Burger Pal' Hambré (Tres Cortes)</div>
+        </div>
+        <div class="option-price">
+          <div class="pp">$18.000</div>
+          <div class="pp-label">por persona</div>
+        </div>
+      </div>
+      <div class="option-body">
+        <div class="desc">Elaborada con tres cortes — pierna, panceta y bondiola — en pan de ajonjolí, quesillo, maíz tierno, cebolla caramelizada, lechuga, tomate y salsa de la casa. Acompañada de papas a la francesa y bebida 250 ml.</div>
+        <div class="option-total">
+          <div class="lbl">Total para 25 personas</div>
+          <div class="amt">$450.000</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="option-card reveal reveal-8">
+      <div class="option-head">
+        <div class="option-num">
+          <div class="badge">3</div>
+          <div class="name">Bowl Desmechado</div>
+        </div>
+        <div class="option-price">
+          <div class="pp">$20.000</div>
+          <div class="pp-label">por persona</div>
+        </div>
+      </div>
+      <div class="option-body">
+        <div class="desc">Carne de cerdo y pollo desmechado, maíz tierno, tocineta, papa cabello de ángel, lechuga y salsa de la casa. Incluye bebida 250 ml.</div>
+        <div class="option-total">
+          <div class="lbl">Total para 25 personas</div>
+          <div class="amt">$500.000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes-grid reveal reveal-8">
+    <div class="note-card">
+      <div class="label">Condiciones de pago</div>
+      <div class="text">
+        50% de anticipo para confirmar la reserva<br>
+        50% restante 48 horas antes del evento<br><br>
+        Nequi · DaviPlata · Bre-B · Transferencia Bancolombia
+      </div>
+    </div>
+    <div class="note-card">
+      <div class="label">Incluye / No incluye</div>
+      <div class="text">
+        ✓ Preparación y entrega del menú elegido<br>
+        ✓ Empaque individual<br>
+        ✓ Entrega en el punto de encuentro acordado<br>
+        ✗ No incluye el paseo en chiva (contratado aparte)<br>
+        ✗ No incluye bebidas adicionales ni licores
+      </div>
+    </div>
+    <div class="note-card">
+      <div class="label">Vigencia de la cotización</div>
+      <div class="text">
+        Esta cotización tiene una vigencia de 15 días calendario a partir de su envío. Precios sujetos a confirmación según disponibilidad para la fecha del evento.
+      </div>
+    </div>
+    <div class="note-card">
+      <div class="label">Confirmación</div>
+      <div class="text">
+        Para reservar el cupo del 03 de julio de 2026, se requiere confirmar la opción de menú elegida y el anticipo correspondiente con al menos 5 días de anticipación.
+      </div>
+    </div>
+  </div>
+
+  <div class="footer reveal reveal-8">
+    <div class="brand">Pal' Hambré</div>
+    <div class="info">
+      Cocina Gourmet · Catering &amp; Eventos · Neiva, Huila<br>
+      WhatsApp 313 847 6309 · @Palhambreneiva<br>
+      Porque trabajar duro merece comer bien.
+    </div>
+    <div class="ornament">✦ ✦ ✦</div>
+  </div>
+
+</div>
+</body>
+</html>
