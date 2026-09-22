@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculadora de Cotización — Mesa de Snacks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --beige: #F5EEDD;
+    --olive: #45592E;
+    --gold: #C9A227;
+    --card: #FFFFFF;
+    --ink: #2B2B24;
+    --muted: #6b6b5f;
+    --danger: #b23b3b;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--beige);
+    color: var(--ink);
+    font-family: 'Work Sans', system-ui, sans-serif;
+  }
+  header {
+    padding: 24px 20px 18px;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+  header .brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--olive);
+  }
+  header .brand b { color: var(--gold); }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 4.5vw, 2.1rem);
+    margin: 8px 0 6px;
+  }
+  header p { max-width: 560px; margin: 0 auto; color: var(--muted); font-size: 0.95rem; }
+  .badge {
+    display: inline-block;
+    margin-top: 10px;
+    background: var(--olive);
+    color: #fff;
+    font-size: 0.72rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 26px 16px 70px; }
+  .card {
+    background: var(--card);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+  .card h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.15rem;
+    color: var(--olive);
+    margin: 0 0 14px;
+  }
+  .field-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 4px;
+  }
+  .field { flex: 1; min-width: 160px; }
+  .field label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 5px; }
+  .field input, .field select {
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid #d9d3c2;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: #fff;
+    color: var(--ink);
+  }
+  #warnFecha, #warnCant {
+    display: none;
+    margin-top: 10px;
+    background: #fbeaea;
+    color: var(--danger);
+    border-left: 4px solid var(--danger);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--muted);
+    padding: 6px 6px;
+    border-bottom: 1px solid #e5ddc9;
+  }
+  tbody td { padding: 8px 6px; border-bottom: 1px solid #f0ebdd; vertical-align: middle; }
+  .item-name-cell { display: flex; align-items: center; gap: 10px; }
+  .item-name-cell img {
+    width: 42px; height: 42px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+  }
+  .item-name-cell .ph {
+    width: 42px; height: 42px; border-radius: 8px; flex-shrink: 0;
+    background: var(--olive);
+  }
+  .item-name-cell span { font-size: 0.9rem; line-height: 1.25; }
+  .qty-input { width: 62px; padding: 6px; text-align: center; border: 1px solid #d9d3c2; border-radius: 6px; font-size: 0.9rem; }
+  .num-cell { text-align: right; font-size: 0.85rem; white-space: nowrap; }
+  .price-small { color: var(--muted); font-size: 0.78rem; }
+  .subtotal-cost { color: var(--ink); }
+  .subtotal-resale { color: var(--olive); font-weight: 600; }
+  .mobile-table thead { display: none; }
+  @media (max-width: 640px) {
+    table, tbody, tr, td { display: block; width: 100%; }
+    thead { display: none; }
+    tbody tr {
+      border: 1px solid #eee2c8;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+    tbody td { border: none; padding: 4px 2px; }
+    .num-cell { text-align: left; }
+    .num-cell::before { content: attr(data-label) ": "; color: var(--muted); font-size: 0.75rem; }
+  }
+  .summary-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 0.95rem; }
+  .summary-row.total { font-size: 1.15rem; font-weight: 700; border-top: 2px solid var(--olive); margin-top: 8px; padding-top: 14px; }
+  .summary-row .lbl { color: var(--muted); }
+  .summary-row.total .lbl { color: var(--ink); }
+  .summary-row .val.cost { color: var(--ink); }
+  .summary-row .val.resale { color: var(--olive); font-weight: 700; }
+  .summary-row .val.profit { color: var(--gold); font-weight: 700; }
+  .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  button.action {
+    flex: 1;
+    min-width: 160px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    border: none;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+  }
+  button.primary { background: var(--gold); color: #2b2b24; }
+  button.secondary { background: transparent; border: 1.5px solid var(--olive); color: var(--olive); }
+  button.action:active { transform: scale(0.98); }
+  #copyMsg { display: none; margin-top: 10px; font-size: 0.85rem; color: var(--olive); text-align: center; }
+  .check-row { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .check-row input { width: 18px; height: 18px; }
+  .check-row label { font-size: 0.92rem; }
+  textarea#quoteOut {
+    width: 100%;
+    margin-top: 14px;
+    min-height: 200px;
+    font-family: 'Work Sans', monospace;
+    font-size: 0.85rem;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #d9d3c2;
+    background: #fbf8f0;
+    color: var(--ink);
+    display: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --beige: #1c1b17; --card: #262420; --ink: #EFEAE0; --muted: #a8a396;
+    }
+    :root:not([data-theme="light"]) .field input,
+    :root:not([data-theme="light"]) .field select,
+    :root:not([data-theme="light"]) .qty-input,
+    :root:not([data-theme="light"]) textarea#quoteOut { background: #302d26; color: var(--ink); border-color: #46433a; }
+  }
+  :root[data-theme="dark"] {
+    --beige: #1c1b17; --card: #262420; --ink: #EFEAE0; --muted: #a8a396;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Pal' <b>Hambré</b> Cocina Gourmet</div>
+  <h1>Calculadora de Cotización</h1>
+  <p>Ingresa las cantidades y obtén al instante lo que te cuesta y el precio sugerido de reventa.</p>
+  <span class="badge">Uso exclusivo · Aliados</span>
+</header>
+
+<div class="wrap">
+
+  <div class="card">
+    <h2>Datos del evento</h2>
+    <div class="field-row">
+      <div class="field">
+        <label for="fechaEvento">Fecha del evento</label>
+        <input type="date" id="fechaEvento">
+      </div>
+      <div class="field">
+        <label for="numPersonas">Número de invitados</label>
+        <input type="number" id="numPersonas" min="0" placeholder="Ej: 40">
+      </div>
+    </div>
+    <div id="warnFecha">⚠ Este pedido requiere al menos 5 días de anticipación. Confirma disponibilidad directamente con Pal' Hambré.</div>
+  </div>
+
+  <div class="card">
+    <h2>Catálogo de pasabocas</h2>
+    <table class="mobile-table">
+      <thead>
+        <tr>
+          <th>Bocadito</th>
+          <th>Su precio</th>
+          <th>Reventa</th>
+          <th>Cant.</th>
+          <th>Subtotal costo</th>
+          <th>Subtotal reventa</th>
+        </tr>
+      </thead>
+      <tbody id="itemsBody"></tbody>
+    </table>
+    <div id="warnCant">⚠ El pedido está por debajo del mínimo de 30 personas / pasabocas. Confirma con Pal' Hambré si aplica.</div>
+  </div>
+
+  <div class="card">
+    <h2>Montaje y decoración</h2>
+    <p class="price-small" style="margin-top:-6px;">Se calcula automáticamente según el número de invitados que ingresaste arriba.</p>
+    <div class="summary-row"><span class="lbl">Rango</span><span class="val" id="montajeRango">—</span></div>
+    <div class="summary-row"><span class="lbl">Su precio / persona</span><span class="val cost" id="montajeCostoUnit">—</span></div>
+    <div class="summary-row"><span class="lbl">Reventa sugerida / persona</span><span class="val resale" id="montajeReventaUnit">—</span></div>
+    <div class="summary-row"><span class="lbl">Subtotal montaje</span><span class="val" id="montajeSubtotales">—</span></div>
+  </div>
+
+  <div class="card">
+    <h2>Asado entre Parceros <span class="price-small">(opcional)</span></h2>
+    <div class="check-row">
+      <input type="checkbox" id="incluirAsado">
+      <label for="incluirAsado">Incluir Asado entre Parceros en esta cotización</label>
+    </div>
+    <div class="field-row" id="asadoFields" style="display:none;">
+      <div class="field">
+        <label for="asadoPersonas">Personas para el asado (mín. 10)</label>
+        <input type="number" id="asadoPersonas" min="10" placeholder="Ej: 20">
+      </div>
+    </div>
+    <div id="asadoSummary" style="display:none; margin-top:10px;">
+      <div class="summary-row"><span class="lbl">Su precio / persona</span><span class="val cost">$45.000</span></div>
+      <div class="summary-row"><span class="lbl">Reventa sugerida / persona</span><span class="val resale">$53.000</span></div>
+      <div class="summary-row"><span class="lbl">Subtotal asado</span><span class="val" id="asadoSubtotales">—</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Transporte <span class="price-small">(si aplica)</span></h2>
+    <div class="field">
+      <label for="transporte">Valor de transporte (mismo valor para costo y reventa)</label>
+      <input type="number" id="transporte" min="0" placeholder="0">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Resumen de la cotización</h2>
+    <div class="summary-row"><span class="lbl">Total su precio (lo que te cuesta)</span><span class="val cost" id="totalCosto">$0</span></div>
+    <div class="summary-row"><span class="lbl">Total reventa sugerida</span><span class="val resale" id="totalReventa">$0</span></div>
+    <div class="summary-row"><span class="lbl">Ganancia estimada</span><span class="val profit" id="totalGanancia">$0</span></div>
+    <div class="summary-row"><span class="lbl">Precio sugerido por persona</span><span class="val resale" id="precioPorPersona">$0</span></div>
+    <div class="summary-row total"><span class="lbl">Anticipo requerido a Pal' Hambré (50%)</span><span class="val cost" id="anticipo">$0</span></div>
+
+    <div class="btn-row">
+      <button class="action primary" id="btnCopiar">📋 Copiar cotización</button>
+      <button class="action secondary" id="btnImprimir">🖨️ Imprimir / Guardar PDF</button>
+    </div>
+    <div id="copyMsg">✓ Cotización copiada al portapapeles</div>
+    <textarea id="quoteOut" readonly></textarea>
+  </div>
+
+</div>
+
+<script>
+const ITEMS = [
+  {id:0, name:'Empanadas cocteleras', costo:2250, reventa:2650, img:''},
+  {id:1, name:'Mini hamburguesas con queso cheddar', costo:6300, reventa:7400, img:'data:image/jpeg;base64,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'},
+  {id:2, name:'Hamburguesa adulto con queso cheddar', costo:13000, reventa:15000, img:'data:image/jpeg;base64,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'},
+  {id:3, name:'Vasito de guacamole con totopos', costo:3600, reventa:4250, img:'data:image/jpeg;base64,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'},
+  {id:4, name:'Rollitos de jamón serrano con brie y rúcula', costo:4250, reventa:5000, img:'data:image/jpeg;base64,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'},
+  {id:5, name:'Mini wraps de pollo caesar con parmesano', costo:3600, reventa:4250, img:'data:image/jpeg;base64,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'},
+  {id:6, name:'Pincho caprese', costo:4200, reventa:4950, img:'data:image/jpeg;base64,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'},
+  {id:7, name:'Mini hot dogs en hojaldre', costo:2550, reventa:3000, img:'data:image/jpeg;base64,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'},
+  {id:8, name:'Mini tacos de carnitas con piña asada', costo:3350, reventa:3950, img:'data:image/jpeg;base64,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'},
+  {id:9, name:'Bolita de queso cheddar con tocineta', costo:2400, reventa:2850, img:'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA4KCw0LCQ4NDA0QDw4RFiQXFhQUFiwgIRokNC43NjMuMjI6QVNGOj1OPjIySGJJTlZYXV5dOEVmbWVabFNbXVn/2wBDAQ8QEBYTFioXFypZOzI7WVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVn/wAARCABaAFoDASIAAhEBAxEB/8QAGwAAAgMBAQEAAAAAAAAAAAAABQYCAwQBAAf/xAA2EAACAQMDAwIEBQMCBwAAAAABAgMABBEFEiExQVETcQYiYYEyUpGh0RSxwRUjByQzQmLw8f/EABgBAAMBAQAAAAAAAAAAAAAAAAECAwAE/8QAHREAAwEAAwEBAQAAAAAAAAAAAAECEQMSITFBUf/aAAwDAQACEQMRAD8Ad7fT4IOdu5vJqd1cpaxFirOe0aDLH2FXlgKWfiG3jmv4HmhuSV4V4pNq48GpXXVeFeOU36aZtZktlM99HDaQEEqryZkP2HFaodQtrlYSkqkzLuQdN2OuKV7m5nmmlihs7WNokwoZt5VR2A6ZNB4pbkyC5W7ge6UCQtKG+TtgduPaodn+l+kj7Nf20LrG8yb2YKFBySScDiriufakWe+0+Mi4WAnUNyuWUn0yQR0z5pm0K5upLFpb4BCWLDPGAayeiucL7K3SNroqOXuGY++BUkQC7n9k/sazWmrWUl1NbRTCWYu77UBIx5zWOz1xWt3u51RGZV3ICeOvn3FCsX0y1hGKYy3tzAYyqwBPnz+IsM1CWNXvVDKCBCeoz1YfxQaH4pthdzB7ecNIygAAN0GMUSW/ha6eSQSQqI1XMq45yazloCaKbvRrKfJMPpse6HFDT8MQ54uJP0FFrRd9/fSiTejFFUA5Awuf81u2fSl1obEycWsTz3KBbFltmbAkdwCR5C9cVl1HVb1b4wwW8TRKcchmZ/OMDArFe6jbRSSwR7bK9K5aSRc84/7f5oXYarFosAYalLdsfm9HZhcn6nnFO73zQqM9wabR7G/klEK/NGcMSmOe9QbTbV9SkWSBGUwqRkf+TUG+HrgpLfapesIIH5yeBk8n70N1b4kbUrspaNLb25Uxs643uvX7c06lNaTbaeBDWr/SdN3RWsMct4CGwvIXBzgn7dBWHTJptaukk1JTJb4dxGDiPAIGNo9+9b0tLXS9M2LbSb5FEhlYjL8A4z4zjjFCbrVtxmMYWLapx6eQOoPHfHH96k73VI6n9Zo/1OHT7pljtoogGcBAvJX3+wwKEJd3WoMtlaoWMfzYHTGOSea9Fb6hrMb3aRrsQEGRjgE56D6/xR/REhsbAh19Oac8HacEkcZ8cdM9TQaxe/R9/hTodm9qJpb22BZAQMkE5wOePH+ayXdxFHcXL7gjesMOBlUAXoMeTxVH9QI4kL+o0gLMMSdCSeo9vtVWlaNcarKZnnWG3OQxX8RPXgdMc0XretgWIK6DFJPA06TvC5cg453Yxniip1OVCVZJyV4JEY/msMUcem2qae3+4ysSSW7t7Y6Cl6W80wSuHT5gxz8ves7qn4BRK+n1S6sLa6JM0KOfqoNAtWi0TQovXltYjM3/AE41A3Mf8D60Z1jUo9K06S6k52jCr+ZuwpI0q1/1eWfVdZDTKx2ooycfYHp2FXvrK1kZ7PxGeyLa9q/qXgItEUzNEh+UHoB178fpRbV5oreExQLGsgBjCquQQ3Xv9Kit1awSTMlsqROcentClMDHPgd/v3pZv71xqCRmXerEbTuzkGoNu68LylK9N2sa6Xt0MbZQ/KVcDrjk/T6e1DLdLlikhtbho1xlgh6dM9OlFPhoW95cT3E6L6dsAERsHJ84NFr+9nS8K7ndwgyyn5gvhhx1rJqHmeme1++Hbu5WKC2tLV1WPA3gAcDB6fp180CvryEzMkcIWMZChuoOOM469R7ear1W/N1F0OU4IA8nxn/3NU6dot7fxLdnba2x43vkkkdDj6niso87UzOkvEatO0aTUIjNc3Jt4uQoCZLAdwenXNG7SZ9J0o24Dn0geJFABBJ5969FcxwaIiO5JjiXKLnIA6nHbqaXr/UxLcMUbahAAAHYUuu3n4HFK1nr3VFmYEvuQpjpwOv60DaFXYt6nU5rrWbyMSj5BOcVcNKmxXZHGpRy3ydj6B/xA3vbWSDPpmQk++OKHwE2mkW6NsVJVYBs45+v801/ENkl7p7IxxtOQ35T5pOuoZLm0FpJlJIgVwD2P81qhWsNNuHoHvJo5pE2BWLdhndngYPPmjsOg2cMC/1y7rpuE3H8Ln6DsKXINOaDULd5SzRJIpYHwDTPqN8quHg5POAGwqk8cHp3/vXLyTXG0kdE0uRPTK8FokM8VnGYZW27wAVBIycefuOOaXrrUfXuFCtI23IK85Y+1WPdzxSsryMCmRwcde3tR/4e0+DdPdsi+oigLJ+Unrj3opJJ1RqfqUga0tb0yKZbSREccFuM+etNt9fRwWW2KMMYyBubII44HHgeapvr0evG0hZZEBeOVFAXpz+wz+1Les3vqRj0JZJHUkHk/UZ5pfeTEHFOtkr6ZTPlZCrEbAoPKjqcjyaX3gmLHaPlJ4APauPcyuCCu0k8nzRKwIW3M1wdsa8Z8/QfWurjjr9Obkvt8J2Ci0gM1zwi9B3J8ConW7zJ2hFXsNo4FZri4kvZQzDbGvCIOgFSEJx+E0XefAKP6fZrlS0RFJ+oj+mkG9C0Q6FeGT2Pj6Hj2pzYZBBoTqNmskZyBtPekbaeodJNYwFatb3LZyshx1Ucj3X/AO0u6razqx9FunAz2Ga23+mPFIWtyQRzgdqwtf3kXySgSgfnG79+tOuRV9EfHU/AHJDcE7XLYpl068aw0xY5tpiYbSjdMHrWMalbbsyWwB+jEf3q2bVrGaEI0LjHcEUXM0sYFVJ6evLhFwV9N4409PHsP27UJjula5wDnsGr076efwpNj8u4AVStwsZ/5aFUP5up/U0kwp9Hq3XgUlW2gT1LkYPUIPxN/A+tDppnu5AWAVF4RB0UVUEeR98hLMfNE7DT3uXHBCeaNWCYO6bYtcyDjCDrTOunqFACLwKvsrJLdFAXp2oiEOPxD9K53Wl0sDzMARnk9lFUvGG+aTnwKtTpnvmonmbnxV2RRgnsg2flGTQe80dHGNo5/emY9F+rVS/O7PmpuSioR7jQ+TgfYihsuiNk/wC0MU/yAccDrWSYDngUmtDYmIZ0jDYETVOPSWPSM+9OIVdh+UdPFd2gHoOB4rdmbqhftNE5Bcfaj1tZrCoAAyP2rVCBzx2qafjoboTkcdXhOO1cj6ip0DH/2Q=='},
+  {id:10, name:'Brochetas de pollo satay con salsa de maní', costo:3350, reventa:3950, img:'data:image/jpeg;base64,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'},
+  {id:11, name:'Cucharaditas de ceviche de camarón', costo:4000, reventa:4700, img:'data:image/jpeg;base64,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'},
+  {id:12, name:'Minisandwich', costo:3450, reventa:4050, img:'data:image/jpeg;base64,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'},
+  {id:13, name:'Pop corn colorido', costo:2200, reventa:2600, img:'data:image/jpeg;base64,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'},
+  {id:14, name:'Paletas de malvaviscos', costo:1800, reventa:2100, img:''},
+  {id:15, name:'Vasito de arroz con leche', costo:2150, reventa:2550, img:'data:image/jpeg;base64,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'},
+  {id:16, name:'Vasito de tres leches con canela', costo:2250, reventa:2650, img:'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAA4KCw0LCQ4NDA0QDw4RFiQXFhQUFiwgIRokNC43NjMuMjI6QVNGOj1OPjIySGJJTlZYXV5dOEVmbWVabFNbXVn/2wBDAQ8QEBYTFioXFypZOzI7WVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVlZWVn/wAARCABaAFoDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAwUBAgQGAP/EADEQAAICAQMCBAQFBAMAAAAAAAECAAMRBBIhBTETQVFxIjJhgRRCUpHhBmKx0SNyof/EABgBAAMBAQAAAAAAAAAAAAAAAAABAgME/8QAHBEAAgMBAQEBAAAAAAAAAAAAAAECAxEhMRIy/9oADAMBAAIRAxEAPwDuKT8MlvlMHSeIU9jAAR7SokniUYhQWJ4EBl5B7yqsGVSpBB5BHnIrdnXLLtOSMQAtnmDsPwmX/NM+qt8Nc7SwzjAiYFPMTTSIBe4mqqCBhh2kSeyykYgdJmjMxUNNYOYICrdoNsFSO+eIPqFV1uisWpTypwQ2CT6e0SaKy/T6qrT2YrQMu12wASe6zGdvy8w1hX9LdHAvqpUKMBVAxjnj2nnLtqKWrfNRUlh9PL/3/EUamrTUa0/h73Va7DuDEkDPJI/mMOm6xdTW+UKsuPLhh5ETOu1yk4tlTryOo0am9dPQbGDNjyUZMELRYoIBG4Z5hOo6EWUBvEKWAfMDx7RH09207v42odqqwQGYcE+f29I52uM++BGtSjz0aqbBqkUAGoqSxx2jCvmL9Df46sWQo/BIzkY8sRhT2m8GmtRjJY8YQ+Qgy3Jlj3gT3MsQCluZsQ5i6lvim2sxIGaL70rqVXOMj2/cxbRTX1LUqcB6qzn0x7feE1evo2gM4Rs7TnjntPdM1C2U3GplYo2CPtOJz+p4dHzkdMXV+maYXi7BXJAZVb4nH6foJl6YbdNXbRqXUuqKqkDG3GeMQ3VNZqq9yVVIMDIcNgk+n0ESVW332OrYDFXwFOedp8401vB9zGdTpi+p1C+K9eyvkjBJf0HfiLes9I02664OUusydxP0498eQmTomo1NjCzxAHHBBPcQ3UdTqtxZFqXB4J5P3zF9LMYY0+BujWWVgUXgeIRlD/aOwP8An7x7XwJyfQbbb+qO1pBOwkge4nVoeJ1Vfkws9JJ5mctyYYngmYy3JmpJAUCTZb4Sgsx57AdzLgQq6fLpfjcu0L/1ImXShJrel6nWq7oNgbnaz9j6wfTBf0am8WBCLjuGD5gczpHViCRg+5mHUaQXV4tAUZ42mZSoXXH01jc/JeHNdU60GRtte444JOM/aZOgatrurIHrACIxPOfKNdX0Wq61PFsbABwQuf3mjRdN0nT91teS7DBY84HpIrrkn0uc4tcMPVdU3T9fU2krQVuuXAHAOe8V67qtzvaodGXuGxge0faj8PqhtNY984i8dP6fdqPDcnYO3xYEJ169QozSWMB/SmpezU6m194GwAYHbJ/idWt1pq3BjiYdPptPo12VIEB5Jzkn7w76iumvk5ZuFXzJm0eIyk9YQ6iz9ZxKbz+qU3feUyPUx6GDRuBJpvspJZOx7g9jKscnEg4xxGI2DVUv8ylD6iVcUuBhwccjtMgGf3htPR41u3OABkmPWTgK2ks3Ny7fMbP5gbKqNhUtwfQR4a6q6wuBgfSJNegwSox7QYIwvVpkHdvsJkb8OjEqtjfQkATFrN4Y8nv6wLakhQSeTwRI0vBib7TwgWsevciepCI5sZi9n6jF63ky628xDQza8esjxx9IuLZEje3qYtGdZPPIP5faef5hLIPA8CXrvali6mDkH5TGBsfqClfirOf7TF2q1qEH/jsP2H+5azsJktg2xJIUa217CfDox9Wb/UXrprC++1snsABgCObBzBEDHaSWYVrxLisw+BntCKBiIYAIZGwzViXiA//Z'},
+  {id:17, name:'Trifle de fresas con crema chantilly', costo:3850, reventa:4550, img:''}
+];
+
+const MONTAJE_TIERS = [
+  {min:0, max:30, costo:3800, reventa:4500, label:'20 – 30 personas'},
+  {min:31, max:50, costo:3300, reventa:3900, label:'31 – 50 personas'},
+  {min:51, max:Infinity, costo:3000, reventa:3550, label:'+50 personas'}
+];
+
+const ASADO_COSTO = 45000;
+const ASADO_REVENTA = 53000;
+const ANTICIPO_PCT = 0.5;
+const MIN_LEAD_DAYS = 5;
+const MIN_TOTAL = 30;
+
+function fmt(n) {
+  const rounded = Math.round(n);
+  const parts = Math.abs(rounded).toString().split('').reverse();
+  let grouped = '';
+  for (let i = 0; i < parts.length; i++) {
+    grouped = parts[i] + grouped;
+    if ((i + 1) % 3 === 0 && i !== parts.length - 1) grouped = '.' + grouped;
+  }
+  return (rounded < 0 ? '-$' : '$') + grouped;
+}
+
+// Build item rows
+const tbody = document.getElementById('itemsBody');
+ITEMS.forEach(it => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>
+      <div class="item-name-cell">
+        ${it.img ? `<img src="${it.img}" alt="${it.name}">` : `<div class="ph"></div>`}
+        <span>${it.name}</span>
+      </div>
+    </td>
+    <td class="num-cell" data-label="Su precio"><span class="price-small">${fmt(it.costo)}</span></td>
+    <td class="num-cell" data-label="Reventa"><span class="price-small">${fmt(it.reventa)}</span></td>
+    <td class="num-cell" data-label="Cantidad"><input type="number" class="qty-input" min="0" value="0" data-id="${it.id}"></td>
+    <td class="num-cell subtotal-cost" data-label="Subtotal costo" id="sub-cost-${it.id}">${fmt(0)}</td>
+    <td class="num-cell subtotal-resale" data-label="Subtotal reventa" id="sub-resale-${it.id}">${fmt(0)}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+function getMontajeTier(personas) {
+  if (!personas || personas <= 0) return null;
+  return MONTAJE_TIERS.find(t => personas >= (t.min || 0) && personas <= t.max) || MONTAJE_TIERS[MONTAJE_TIERS.length-1];
+}
+
+function recalc() {
+  let totalItemsCosto = 0, totalItemsReventa = 0, totalBocaditos = 0;
+  ITEMS.forEach(it => {
+    const input = document.querySelector(`.qty-input[data-id="${it.id}"]`);
+    const qty = parseInt(input.value) || 0;
+    totalBocaditos += qty;
+    const subCost = qty * it.costo;
+    const subResale = qty * it.reventa;
+    totalItemsCosto += subCost;
+    totalItemsReventa += subResale;
+    document.getElementById(`sub-cost-${it.id}`).textContent = fmt(subCost);
+    document.getElementById(`sub-resale-${it.id}`).textContent = fmt(subResale);
+  });
+
+  const personas = parseInt(document.getElementById('numPersonas').value) || 0;
+  const tier = getMontajeTier(personas);
+  let montajeCosto = 0, montajeReventa = 0;
+  if (tier) {
+    document.getElementById('montajeRango').textContent = tier.label;
+    document.getElementById('montajeCostoUnit').textContent = fmt(tier.costo);
+    document.getElementById('montajeReventaUnit').textContent = fmt(tier.reventa);
+    montajeCosto = tier.costo * personas;
+    montajeReventa = tier.reventa * personas;
+    document.getElementById('montajeSubtotales').textContent = fmt(montajeCosto) + ' / ' + fmt(montajeReventa);
+  } else {
+    document.getElementById('montajeRango').textContent = '—';
+    document.getElementById('montajeCostoUnit').textContent = '—';
+    document.getElementById('montajeReventaUnit').textContent = '—';
+    document.getElementById('montajeSubtotales').textContent = '—';
+  }
+
+  // Asado
+  const incluirAsado = document.getElementById('incluirAsado').checked;
+  document.getElementById('asadoFields').style.display = incluirAsado ? 'flex' : 'none';
+  document.getElementById('asadoSummary').style.display = incluirAsado ? 'block' : 'none';
+  let asadoCosto = 0, asadoReventa = 0, asadoPersonas = 0;
+  if (incluirAsado) {
+    asadoPersonas = parseInt(document.getElementById('asadoPersonas').value) || 0;
+    asadoCosto = asadoPersonas * ASADO_COSTO;
+    asadoReventa = asadoPersonas * ASADO_REVENTA;
+    document.getElementById('asadoSubtotales').textContent = fmt(asadoCosto) + ' / ' + fmt(asadoReventa);
+  }
+
+  const transporte = parseFloat(document.getElementById('transporte').value) || 0;
+
+  const totalCosto = totalItemsCosto + montajeCosto + asadoCosto + transporte;
+  const totalReventa = totalItemsReventa + montajeReventa + asadoReventa + transporte;
+  const ganancia = totalReventa - totalCosto;
+  const anticipo = totalCosto * ANTICIPO_PCT;
+  const precioPorPersona = personas > 0 ? totalReventa / personas : 0;
+
+  document.getElementById('totalCosto').textContent = fmt(totalCosto);
+  document.getElementById('totalReventa').textContent = fmt(totalReventa);
+  document.getElementById('totalGanancia').textContent = fmt(ganancia);
+  document.getElementById('precioPorPersona').textContent = personas > 0 ? fmt(precioPorPersona) : '—';
+  document.getElementById('anticipo').textContent = fmt(anticipo);
+
+  // Minimum quantity warning
+  const warnCant = document.getElementById('warnCant');
+  const baseCount = personas > 0 ? personas : totalBocaditos;
+  warnCant.style.display = (baseCount > 0 && baseCount < MIN_TOTAL) ? 'block' : 'none';
+
+  return {totalCosto, totalReventa, ganancia, anticipo, personas, precioPorPersona, tier, montajeCosto, montajeReventa, incluirAsado, asadoPersonas, asadoCosto, asadoReventa, transporte, totalBocaditos};
+}
+
+function checkFecha() {
+  const val = document.getElementById('fechaEvento').value;
+  const warnFecha = document.getElementById('warnFecha');
+  if (!val) { warnFecha.style.display = 'none'; return; }
+  const eventDate = new Date(val + 'T00:00:00');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const diffDays = Math.round((eventDate - today) / (1000*60*60*24));
+  warnFecha.style.display = (diffDays < MIN_LEAD_DAYS) ? 'block' : 'none';
+}
+
+document.addEventListener('input', (e) => {
+  if (e.target.matches('.qty-input, #numPersonas, #asadoPersonas, #transporte')) recalc();
+  if (e.target.id === 'fechaEvento') checkFecha();
+});
+document.getElementById('incluirAsado').addEventListener('change', recalc);
+
+document.getElementById('btnImprimir').addEventListener('click', () => window.print());
+
+document.getElementById('btnCopiar').addEventListener('click', () => {
+  const r = recalc();
+  let lines = [];
+  lines.push('COTIZACIÓN — Pal\' Hambré Cocina Gourmet');
+  lines.push('=====================================');
+  const fecha = document.getElementById('fechaEvento').value;
+  if (fecha) lines.push('Fecha del evento: ' + fecha);
+  if (r.personas > 0) lines.push('Invitados: ' + r.personas);
+  lines.push('');
+  lines.push('BOCADITOS:');
+  ITEMS.forEach(it => {
+    const input = document.querySelector(`.qty-input[data-id="${it.id}"]`);
+    const qty = parseInt(input.value) || 0;
+    if (qty > 0) {
+      lines.push(`- ${it.name} x${qty}: ${fmt(qty * it.reventa)}`);
+    }
+  });
+  if (r.tier) {
+    lines.push('');
+    lines.push(`Montaje y decoración (${r.personas} pers.): ${fmt(r.montajeReventa)}`);
+  }
+  if (r.incluirAsado && r.asadoPersonas > 0) {
+    lines.push('');
+    lines.push(`Asado entre Parceros (${r.asadoPersonas} pers.): ${fmt(r.asadoReventa)}`);
+  }
+  if (r.transporte > 0) {
+    lines.push('');
+    lines.push(`Transporte: ${fmt(r.transporte)}`);
+  }
+  lines.push('');
+  lines.push('=====================================');
+  lines.push('TOTAL: ' + fmt(r.totalReventa));
+  if (r.personas > 0) lines.push('Precio por persona: ' + fmt(r.precioPorPersona));
+  lines.push('');
+  lines.push('Anticipo requerido (50%): ' + fmt(r.anticipo));
+  lines.push('Anticipación mínima: 5 días antes del evento');
+
+  const text = lines.join('\n');
+  const out = document.getElementById('quoteOut');
+  out.value = text;
+  out.style.display = 'block';
+
+  const finish = () => {
+    document.getElementById('copyMsg').style.display = 'block';
+    setTimeout(() => { document.getElementById('copyMsg').style.display = 'none'; }, 2500);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(finish).catch(() => {
+      out.select();
+      try { document.execCommand('copy'); } catch(e) {}
+      finish();
+    });
+  } else {
+    out.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    finish();
+  }
+});
+
+recalc();
+</script>
+
+</body>
+</html>
